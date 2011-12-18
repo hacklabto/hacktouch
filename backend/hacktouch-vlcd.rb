@@ -1,4 +1,12 @@
 #!/usr/bin/env ruby
+#
+# VLC RC remote.
+# Alternative to hacklab-audiod
+#
+# Run vlc somewhere, using "vlc -I rc --rc-host ip:4212"
+# The port will have to be added in frontend by hand.
+#
+
 
 require 'rubygems'
 require 'amqp'
@@ -6,27 +14,23 @@ require 'json'
 require 'log4r'
 require 'log4r/configurator'
 require 'lib/hacktouchbackendmq'
+require 'socket'
 include Log4r
-
-#VLC = "/Applications/VLC.app/Contents/MacOS/VLC";
-VLC = "/usr/bin/vlc"
-VLC_ARGS = "--intf=dummy --control=rc --rc-fake-tty";
 
 class VLCControl
   def initialize
     begin
-      # launch VLC and attach an I/O object to its remote control interface
-      @vlc = IO.popen("#{VLC} #{VLC_ARGS} 2>/dev/null", "w+")
+      @vlc=TCPSocket.new("192.168.111.142", 4212) 
     rescue
       puts "error: #{$!}"
     end
   end
-  
+    
   def playlist_clear
     exec_cmd "clear"
   end
 
-  def pause
+  def pause 
     exec_cmd "pause"
   end
   
@@ -39,7 +43,7 @@ class VLCControl
   end
   
   def playlist_add(source)
-    exec_cmd "add \"#{source}\""
+    exec_cmd "add #{source}"
   end
   
   def quit
@@ -85,6 +89,7 @@ class VLCControl
   end
   
   def exec_cmd(cmd)
+    flush_input(@vlc)
     @vlc.puts(cmd)
     get_retval
   end
@@ -112,19 +117,20 @@ AMQP.start(:host => 'localhost') do
         else
           msg.respond_with_error "No audio source provided."
           log.warn("Queue command received with no audio source")
-        end        
+        end       
       when 'play' then
         if(msg['source']) then
+          log.debug("Playing new source.")
           log.info("Playing #{msg['source']}.")
           vlc.playlist_clear
           vlc.playlist_add(msg['source']);
         else
-          log.debug("Playing existing playlist item.")
+          log.info("Playing existing playlist item.")
           vlc.play
         end
 #        msg.respond_with_success
       when 'pause' then
-        vlc.pause
+       vlc.pause
 #        msg.respond_with_success
       when 'stop' then
         vlc.stop
@@ -132,7 +138,7 @@ AMQP.start(:host => 'localhost') do
       when 'now_playing' then
         response_msg = Hash.new
         response_msg['now_playing'] = vlc.now_playing
-#        msg.respond_with_success response_msg
+        msg.respond_with_success response_msg
       when 'status' then
         response_msg = Hash.new
         if(vlc.playing?) then
@@ -140,7 +146,7 @@ AMQP.start(:host => 'localhost') do
         else
           response_msg['status'] = "stopped"
         end
-#        msg.respond_with_success response_msg
+        msg.respond_with_success response_msg
     end
     log.debug "Command processing complete."
   }

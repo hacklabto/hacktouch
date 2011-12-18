@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-require 'mq'
+require 'amqp'
 require 'json'
 require 'sequel'
 require 'yaml'

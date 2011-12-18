@@ -4,7 +4,7 @@ require 'rubygems'
 require 'rss/1.0'
 require 'rss/2.0'
 require 'open-uri'
-require 'mq'
+require 'amqp'
 require 'json'
 require 'sequel'
 require 'log4r'
@@ -31,13 +31,26 @@ AMQP.start(:host => 'localhost') do
           arrival_times[msg['stop']] = Hash.new
           arrival_times[msg['stop']]["last_refresh"] = Time.now.to_i
           dirs.each do |dir|
-            @log.debug "Fetching arrival data for #{msg['stop']} #{dir}"
+            @log.debug "Fetching arrival data for #{msg['stop']} #{msg[dir]}"
             xml = ""
             @log.debug xml
             open("http://webservices.nextbus.com/service/publicXMLFeed?command=predictions&a=ttc&s=#{msg[dir]}&r=#{msg['route']}") do |s| xml = s.read end
             doc = REXML::Document.new xml
-            arrival_times[msg['stop']][dir] = doc.elements['body/predictions/direction/prediction#minutes'].attributes['minutes']
+            times = ""
+            doc.elements.each("body/predictions/direction") { |element|
+              dir_title=element.attributes["title"]
+              times=times+dir_title+":  "
+              doc.elements.each("body/predictions/direction[@title='"+dir_title+"']/prediction") { |pred| times=times+pred.attributes["minutes"]+" " }
+              times+="<br />"
+            }
+            puts times
+            if doc.elements["body/predictions/direction/prediction"] != nil
+              #arrival_times[msg['stop']][dir] = doc.elements["body/predictions/direction/prediction"].attributes['minutes']
+              arrival_times[msg['stop']][dir]=times
+            else
+              arrival_times[msg['stop']][dir] = "None :(";
             end
+          end
           else
             @log.debug "Using previously cached location data for #{msg['stop']}"
           end

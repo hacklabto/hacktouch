@@ -32,6 +32,12 @@ get '/now_playing' do
   response_msg['now_playing']
 end
 
+post '/to_cmd' do
+  msg = Hash.new
+  msg['char'] = params[:char]
+  Carrot.queue("hacktouch.train-overlord.request").publish(msg.to_json)
+end
+
 post '/now_playing' do
   msg = Hash.new
   msg['command'] = 'play'
@@ -109,9 +115,9 @@ get '/streetcar' do
   msg = Hash.new
   msg['command'] = 'next'
   msg['route'] = '510'
-  msg['stop'] = "spadnass"
-  msg['dir1'] = "spadnass_n"
-  msg['dir2'] = "spadnass_s"
+  msg['stop'] = 'Nassau'
+  msg['dir1'] = '6577'
+  msg['dir2'] = '3159'
   begin
     response_msg = HacktouchMQ.mq_request("hacktouch.streetcar.request", msg)
   rescue TimeoutException

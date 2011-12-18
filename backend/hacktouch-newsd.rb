@@ -4,7 +4,7 @@ require 'rubygems'
 require 'rss/1.0'
 require 'rss/2.0'
 require 'open-uri'
-require 'mq'
+require 'amqp'
 require 'json'
 require 'sequel'
 require 'log4r'
@@ -55,7 +55,9 @@ AMQP.start(:host => 'localhost') do
         randomItem = rand(randomFeed.items.length)
         response_msg = Hash.new
         response_msg['source'] = randomFeed.channel.title
+        response_msg['source_url'] = randomFeed.channel.link
         response_msg['title'] = randomFeed.items[randomItem].title
+        response_msg['url'] = randomFeed.items[randomItem].link
         response_msg['content'] = randomFeed.items[randomItem].description.split("at Slashdot.")[0]
         @log.debug "replying to #{header.properties[:reply_to]} with an article from #{msg['source']}"
         msg.respond_with_success response_msg

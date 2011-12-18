@@ -19,4 +19,5 @@
   <logger name="hacktouch::backend::weatherd" />
   <logger name="hacktouch::backend::doord" />
   <logger name="hacktouch::backend::streetcar" />
+  <logger name="hacktouch::backend::train-overlord" />
 </log4r_config>
