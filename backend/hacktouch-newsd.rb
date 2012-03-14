@@ -9,14 +9,14 @@ require 'json'
 require 'sequel'
 require 'log4r'
 require 'log4r/configurator'
-require 'lib/hacktouchbackendmq'
+require_relative 'lib/hacktouchbackendmq'
 include Log4r
 
-Configurator.load_xml_file('log4r.xml')
+Configurator.load_xml_file(File.dirname(__FILE__)+'/log4r.xml')
 @log = Logger.get('hacktouch::backend::newsd')
 
 def feed_list
-  db = Sequel.connect('sqlite://hacktouch.sqlite3')
+  db = Sequel.connect("sqlite://#{File.dirname(__FILE__)}/../frontend/hacktouch.sqlite3")
   stream_list = Array.new
   db[:news_feeds].order(:name).each do |stream|
     stream_list.push(stream[:url]);

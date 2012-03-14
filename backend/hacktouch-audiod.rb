@@ -5,7 +5,7 @@ require 'amqp'
 require 'json'
 require 'log4r'
 require 'log4r/configurator'
-require 'lib/hacktouchbackendmq'
+require_relative 'lib/hacktouchbackendmq'
 include Log4r
 
 #VLC = "/Applications/VLC.app/Contents/MacOS/VLC";
@@ -90,7 +90,7 @@ class VLCControl
   end
 end
 
-Configurator.load_xml_file('log4r.xml')
+Configurator.load_xml_file(File.dirname(__FILE__)+'/log4r.xml')
 log = Logger.get('hacktouch::backend::audiod')
 
 AMQP.start(:host => 'localhost') do
