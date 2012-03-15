@@ -1,10 +1,8 @@
-!dialogbackgroundcolor = #111
-!dialogforegroundcolor = #ddd
+$dialogbackgroundcolor: #111
+$dialogforegroundcolor: #ddd
 
-=border-radius(!radius)
-  /*-moz-border-radius = !radius*/
-  /*-webkit-border-radius = !radius*/
-  border-radius = !radius
+@mixin border-radius($radius)
+  border-radius: $radius
 
 body
   background-color: #000
@@ -12,8 +10,8 @@ body
   overflow: hidden
 
 select
-  background-color = !dialogbackgroundcolor
-  color = !dialogforegroundcolor
+  background-color: $dialogbackgroundcolor
+  color: $dialogforegroundcolor
   margin: 5mm
   font-size: 1.5em
   width: 95%
@@ -27,13 +25,13 @@ ul
   text-indent: -1cm
   margin: 0
 
-=news_headline
+@mixin news_headline
   color: #00f
 
-=box
+@mixin box
   font-family: sans-serif
   background-color: #333
-  +border-radius(15px)
+  @include border-radius(15px)
   text-align: center
   color: #ddd
   margin: 0.25cm
@@ -42,22 +40,22 @@ ul
   overflow: hidden
   
 .boxSquare
-  +box
+  @include box
   width: 6cm
   height: 6cm
 
 .boxHorizontal 
-  +box
+  @include box
   width: 12.5cm
   height: 6cm
   
 .boxVertical
-  +box
+  @include box
   width: 6cm
   height: 12.5cm
 
 .boxQuad
-  +box
+  @include box
   width: 12.5cm
   height: 12.5cm
   overflow: hidden
@@ -74,8 +72,8 @@ ul
 
 .boxFloatingDialog
   font-family: sans-serif
-  background-color = !dialogbackgroundcolor
-  color = !dialogforegroundcolor
+  background-color: $dialogbackgroundcolor
+  color: $dialogforegroundcolor
   height: 28em
   width: 87%
   border-left: 5px solid #99d
@@ -89,7 +87,7 @@ ul
 
 .dialogButtonBox
 
-=news
+@mixin news
   width: 50%
   float: right
   display: block
@@ -108,13 +106,13 @@ ul
 .ttcRoute 
   background-color: #d00
   color: #fff
-  +border-radius(3px)
+  @include border-radius(3px)
   padding: 1mm
   margin-right: 0.3em
   font-size: 1.25em
 
 .boxButton 
-  +border-radius(8px)
+  @include border-radius(8px)
   padding: 2mm
   padding-bottom: 0
   text-align: center
