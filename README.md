@@ -6,10 +6,17 @@ Installation
 3. get this repo with git
 4. run `bundle install` from the repo folder
 
+
 Running the Hack Touch
 =======================
 
 `./scripts/start.sh`
+
+
+Visiting the Hack Touch
+========================
+
+Visit `http://localhost:3000/` in your browser.
 
 
 Legacy Instructions.. in case the other instructions are borked
